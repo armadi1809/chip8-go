@@ -1,2 +1,2 @@
-# chip8-go
-A Chip 8 emulator written in Go
+# chip8go
+A Chip 8 emulator written in Golang
