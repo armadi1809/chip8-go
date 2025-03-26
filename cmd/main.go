@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/armadi1809/chip8go/chip8"
+	"github.com/armadi1809/chip8-go/chip8"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )

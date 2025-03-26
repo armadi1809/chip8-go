@@ -1,4 +1,4 @@
-module github.com/armadi1809/chip8go
+module github.com/armadi1809/chip8-go
 
 go 1.24.1
 
