@@ -299,16 +299,15 @@ func (chip *Chip8) EmulateCycle() {
 		fmt.Printf("unkown opcode 0x%X\n", chip.opcode)
 	}
 
-	chip.updateTimers()
-
 }
 
-func (chip *Chip8) updateTimers() {
+func (chip *Chip8) UpdateTimers(beepSound func()) {
 	if chip.delay_timer > 0 {
 		chip.delay_timer--
 	}
 	if chip.sound_timer > 0 {
 		if chip.sound_timer == 1 {
+			beepSound()
 			fmt.Printf("SIMULATING SOUND: BEEP\n")
 		}
 		chip.sound_timer--

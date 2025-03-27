@@ -6,12 +6,15 @@ import (
 
 	"github.com/armadi1809/chip8-go/chip8"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type Game struct {
-	emulator *chip8.Chip8
-	pixels   []byte
+	emulator            *chip8.Chip8
+	pixels              []byte
+	beepSoundEffectData []byte
+	audioContext        *audio.Context
 }
 
 const clockRate = 10
@@ -43,6 +46,9 @@ func (g *Game) Update() error {
 	for range clockRate {
 		g.emulator.EmulateCycle()
 	}
+	g.emulator.UpdateTimers(func() {
+		g.playBeepSoundEffect()
+	})
 	return nil
 }
 
@@ -68,7 +74,12 @@ func main() {
 	emulator := chip8.New()
 	emulator.Initialize()
 	emulator.LoadProgram(os.Args[1])
-	if err := ebiten.RunGame(&Game{emulator: emulator}); err != nil {
+	game := &Game{
+		emulator:     emulator,
+		audioContext: audio.NewContext(48000),
+	}
+	game.setBeepSoundEffectDataFromPath("./resources/audio/beep-03.mp3")
+	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -107,4 +118,17 @@ func getPixelsFromEmulator(emulator *chip8.Chip8) []byte {
 	}
 	return rgbaArray
 
+}
+
+func (g *Game) setBeepSoundEffectDataFromPath(audioFilePath string) {
+	audioData, err := os.ReadFile(audioFilePath)
+	if err != nil {
+		log.Fatalf("an error occurred setting up the audio player for file %s: %v\n", audioFilePath, err)
+	}
+	g.beepSoundEffectData = audioData
+}
+
+func (g *Game) playBeepSoundEffect() {
+	beepSePlayer := g.audioContext.NewPlayerF32FromBytes(g.beepSoundEffectData)
+	beepSePlayer.Play()
 }
