@@ -1,1 +1,3 @@
 .DS_Store
+web-assets/main.wasm
+webassets/wasm_exec.js
