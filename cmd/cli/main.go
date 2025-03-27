@@ -14,7 +14,7 @@ func main() {
 	}
 	ebiten.SetWindowSize(640, 480)
 	ebiten.SetWindowTitle("Chip 8 In Golang")
-	game := graphics.NewGame(os.Args[1], "./resources/audio/beep-03.mp3")
+	game := graphics.NewGame(os.Args[1])
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}

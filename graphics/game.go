@@ -2,8 +2,8 @@ package graphics
 
 import (
 	"bytes"
+	_ "embed"
 	"io"
-	"os"
 
 	"github.com/armadi1809/chip8-go/chip8"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -18,6 +18,9 @@ type Game struct {
 	beepSoundEffectData []byte
 	audioContext        *audio.Context
 }
+
+//go:embed audio/beep-03.mp3
+var defaultBeep []byte
 
 const clockRate = 10
 
@@ -67,7 +70,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return 64, 32
 }
 
-func NewGame(romPath, beepSoundEffect string) *Game {
+func NewGame(romPath string) *Game {
 	emulator := chip8.New()
 	emulator.Initialize()
 	emulator.LoadProgram(romPath)
@@ -75,7 +78,7 @@ func NewGame(romPath, beepSoundEffect string) *Game {
 		emulator:     emulator,
 		audioContext: audio.NewContext(48000),
 	}
-	game.setBeepSoundEffectDataFromPath(beepSoundEffect)
+	game.setBeepSoundEffect()
 	return game
 }
 
@@ -115,12 +118,8 @@ func getPixelsFromEmulator(emulator *chip8.Chip8) []byte {
 
 }
 
-func (g *Game) setBeepSoundEffectDataFromPath(audioFilePath string) error {
-	audioData, err := os.ReadFile(audioFilePath)
-	if err != nil {
-		return err
-	}
-	s, err := mp3.DecodeF32(bytes.NewReader(audioData))
+func (g *Game) setBeepSoundEffect() error {
+	s, err := mp3.DecodeF32(bytes.NewReader(defaultBeep))
 	if err != nil {
 		return err
 	}
