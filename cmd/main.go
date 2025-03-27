@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"log"
 	"os"
 
 	"github.com/armadi1809/chip8-go/chip8"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
@@ -46,9 +49,9 @@ func (g *Game) Update() error {
 	for range clockRate {
 		g.emulator.EmulateCycle()
 	}
-	g.emulator.UpdateTimers(func() {
-		g.playBeepSoundEffect()
-	})
+	g.emulator.UpdateTimers()
+	g.playBeepSoundEffectIfNeeded()
+
 	return nil
 }
 
@@ -120,15 +123,27 @@ func getPixelsFromEmulator(emulator *chip8.Chip8) []byte {
 
 }
 
-func (g *Game) setBeepSoundEffectDataFromPath(audioFilePath string) {
+func (g *Game) setBeepSoundEffectDataFromPath(audioFilePath string) error {
 	audioData, err := os.ReadFile(audioFilePath)
 	if err != nil {
-		log.Fatalf("an error occurred setting up the audio player for file %s: %v\n", audioFilePath, err)
+		return err
 	}
-	g.beepSoundEffectData = audioData
+	s, err := mp3.DecodeF32(bytes.NewReader(audioData))
+	if err != nil {
+		return err
+	}
+	audioBytes, err := io.ReadAll(s)
+	if err != nil {
+		return err
+	}
+	g.beepSoundEffectData = audioBytes
+	return nil
 }
 
-func (g *Game) playBeepSoundEffect() {
-	beepSePlayer := g.audioContext.NewPlayerF32FromBytes(g.beepSoundEffectData)
-	beepSePlayer.Play()
+func (g *Game) playBeepSoundEffectIfNeeded() {
+	if g.emulator.PlayBeepSoundEffectFlag {
+		beepSePlayer := g.audioContext.NewPlayerF32FromBytes(g.beepSoundEffectData)
+		beepSePlayer.Play()
+		g.emulator.PlayBeepSoundEffectFlag = false
+	}
 }
