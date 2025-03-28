@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/armadi1809/chip8-go/chip8"
+	"github.com/armadi1809/chip8-go/graphics/widgets"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
@@ -17,6 +18,7 @@ type Game struct {
 	pixels              []byte
 	beepSoundEffectData []byte
 	audioContext        *audio.Context
+	combobox            *widgets.ComboBox
 }
 
 //go:embed audio/beep-03.mp3
@@ -58,6 +60,7 @@ func (g *Game) Update() error {
 	}
 	g.emulator.UpdateTimers()
 	g.playBeepSoundEffectIfNeeded()
+	g.combobox.Update()
 
 	return nil
 }
@@ -67,12 +70,19 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.pixels = getPixelsFromEmulator(g.emulator)
 		g.emulator.DrawFlag = false
 	}
-	screen.WritePixels(g.pixels)
+	emulatorImg := ebiten.NewImage(64, 32)
+
+	emulatorImg.WritePixels(g.pixels)
+	emulatorDrawOptions := &ebiten.DrawImageOptions{}
+	emulatorDrawOptions.GeoM.Scale(10, 12)
+	emulatorDrawOptions.GeoM.Translate(0, 50)
+	screen.DrawImage(emulatorImg, emulatorDrawOptions)
+	g.combobox.Draw(screen)
 
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 64, 32
+	return outsideWidth, outsideHeight
 }
 
 func NewGame() *Game {
@@ -82,6 +92,7 @@ func NewGame() *Game {
 	game := &Game{
 		emulator:     emulator,
 		audioContext: audio.NewContext(48000),
+		combobox:     widgets.NewComboBox(3, 3, 150, 20, []string{"pong", "space invaders"}),
 	}
 	game.setBeepSoundEffect()
 	return game

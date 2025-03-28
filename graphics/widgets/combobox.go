@@ -1,8 +1,7 @@
-package graphics
+package widgets
 
 import (
 	"bytes"
-	_ "embed"
 	"image/color"
 	"log"
 
@@ -56,10 +55,10 @@ func (cb *ComboBox) Draw(screen *ebiten.Image) {
 	selectedOption := cb.Options[cb.SelectedIndex]
 	op := &text.DrawOptions{}
 
-	op.ColorScale.SetA(0)
+	op.ColorScale.SetA(255)
 	op.ColorScale.SetR(255)
-	op.ColorScale.SetG(0)
-	op.ColorScale.SetB(0)
+	op.ColorScale.SetG(255)
+	op.ColorScale.SetB(255)
 
 	op.GeoM.Translate(cb.X+5, cb.Y)
 
@@ -71,10 +70,10 @@ func (cb *ComboBox) Draw(screen *ebiten.Image) {
 			optionY := cb.Y + float64(i)*cb.Height
 			vector.DrawFilledRect(screen, float32(cb.X), float32(optionY), float32(cb.Width), float32(cb.Height), boxColor, true)
 			op = &text.DrawOptions{}
-			op.ColorScale.SetA(0)
+			op.ColorScale.SetA(255)
 			op.ColorScale.SetR(255)
-			op.ColorScale.SetG(0)
-			op.ColorScale.SetB(0)
+			op.ColorScale.SetG(255)
+			op.ColorScale.SetB(255)
 			op.GeoM.Translate(cb.X+5, optionY)
 			text.Draw(screen, option, cb.Font, op)
 		}
