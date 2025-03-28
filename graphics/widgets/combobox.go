@@ -67,7 +67,7 @@ func (cb *ComboBox) Draw(screen *ebiten.Image) {
 	// Draw the dropdown menu if open
 	if cb.IsOpen {
 		for i, option := range cb.Options {
-			optionY := cb.Y + float64(i)*cb.Height
+			optionY := cb.Y + float64(i+1)*cb.Height
 			vector.DrawFilledRect(screen, float32(cb.X), float32(optionY), float32(cb.Width), float32(cb.Height), boxColor, true)
 			op = &text.DrawOptions{}
 			op.ColorScale.SetA(255)
@@ -91,7 +91,7 @@ func (cb *ComboBox) Update() {
 			cb.IsOpen = !cb.IsOpen // Toggle dropdown
 		} else if cb.IsOpen { // Check if an option is clicked
 			for i := range cb.Options {
-				optionY := cb.Y + float64(i)*cb.Height
+				optionY := cb.Y + float64(i+1)*cb.Height
 				if float64(mouseX) >= cb.X && float64(mouseX) <= cb.X+cb.Width &&
 					float64(mouseY) >= optionY && float64(mouseY) <= optionY+cb.Height {
 					cb.SelectedIndex = i
