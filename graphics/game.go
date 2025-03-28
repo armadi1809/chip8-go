@@ -22,6 +22,11 @@ type Game struct {
 //go:embed audio/beep-03.mp3
 var defaultBeep []byte
 
+// ROMS
+//
+//go:embed roms/pong2.ch8
+var pong2 []byte
+
 const clockRate = 10
 
 var keyboardToEmulatorMap map[ebiten.Key]int = map[ebiten.Key]int{
@@ -70,10 +75,10 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return 64, 32
 }
 
-func NewGame(romPath string) *Game {
+func NewGame() *Game {
 	emulator := chip8.New()
 	emulator.Initialize()
-	emulator.LoadProgram(romPath)
+	emulator.LoadProgram(pong2)
 	game := &Game{
 		emulator:     emulator,
 		audioContext: audio.NewContext(48000),

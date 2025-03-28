@@ -2,9 +2,7 @@ package chip8
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
-	"os"
 )
 
 type Chip8 struct {
@@ -86,14 +84,9 @@ func (chip *Chip8) Initialize() {
 	chip.DrawFlag = true
 }
 
-func (chip *Chip8) LoadProgram(path string) {
-	buffer, err := os.ReadFile(path)
-	if err != nil {
-		log.Panicf("an error ocurred when reading the source code of the provided path %v", err)
-	}
-
-	for i := range len(buffer) {
-		chip.memory[i+512] = buffer[i]
+func (chip *Chip8) LoadProgram(rom []byte) {
+	for i := range len(rom) {
+		chip.memory[i+512] = rom[i]
 	}
 }
 
