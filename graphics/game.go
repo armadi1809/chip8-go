@@ -29,6 +29,16 @@ var defaultBeep []byte
 //go:embed roms/pong2.ch8
 var pong2 []byte
 
+//go:embed roms/IBM-Logo.ch8
+var testOpcode []byte
+
+var titles = []string{"pong2", "test_opcode"}
+
+var titleToRomMap = map[string][]byte{
+	"pong2":       pong2,
+	"test_opcode": testOpcode,
+}
+
 const clockRate = 10
 
 var keyboardToEmulatorMap map[ebiten.Key]int = map[ebiten.Key]int{
@@ -60,7 +70,12 @@ func (g *Game) Update() error {
 	}
 	g.emulator.UpdateTimers()
 	g.playBeepSoundEffectIfNeeded()
+	previousrom := g.combobox.SelectedIndex
 	g.combobox.Update()
+	if g.combobox.SelectedIndex != previousrom {
+		g.emulator.Initialize()
+		g.emulator.LoadProgram(titleToRomMap[titles[g.combobox.SelectedIndex]])
+	}
 
 	return nil
 }
@@ -92,7 +107,7 @@ func NewGame() *Game {
 	game := &Game{
 		emulator:     emulator,
 		audioContext: audio.NewContext(48000),
-		combobox:     widgets.NewComboBox(3, 3, 150, 20, []string{"pong", "space invaders"}),
+		combobox:     widgets.NewComboBox(3, 3, 150, 20, titles),
 	}
 	game.setBeepSoundEffect()
 	return game

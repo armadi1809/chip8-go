@@ -43,7 +43,7 @@ var fontset []uint8 = []uint8{
 func New() *Chip8 {
 	return &Chip8{
 		opcode: 0,
-		pc:     0x200,
+		pc:     0,
 		I:      0,
 		sp:     0,
 	}
@@ -82,6 +82,7 @@ func (chip *Chip8) Initialize() {
 
 	// draw clear screen at initialization
 	chip.DrawFlag = true
+	chip.pc = 0x200
 }
 
 func (chip *Chip8) LoadProgram(rom []byte) {
