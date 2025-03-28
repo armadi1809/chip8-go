@@ -1,4 +1,4 @@
-package main
+package graphics
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"golang.org/x/image/font/gofont/goregular"
 	"golang.org/x/text/language"
 )
 
@@ -21,11 +22,8 @@ type ComboBox struct {
 	Font          text.Face // Font for rendering text
 }
 
-//go:embed data-latin.ttf
-var font []byte
-
 func NewComboBox(x, y, width, height float64, options []string) *ComboBox {
-	s, err := text.NewGoTextFaceSource(bytes.NewReader(font))
+	s, err := text.NewGoTextFaceSource(bytes.NewReader(goregular.TTF))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,7 +70,12 @@ func (cb *ComboBox) Draw(screen *ebiten.Image) {
 		for i, option := range cb.Options {
 			optionY := cb.Y + float64(i)*cb.Height
 			vector.DrawFilledRect(screen, float32(cb.X), float32(optionY), float32(cb.Width), float32(cb.Height), boxColor, true)
-			op.GeoM.Translate(0, optionY)
+			op = &text.DrawOptions{}
+			op.ColorScale.SetA(0)
+			op.ColorScale.SetR(255)
+			op.ColorScale.SetG(0)
+			op.ColorScale.SetB(0)
+			op.GeoM.Translate(cb.X+5, optionY)
 			text.Draw(screen, option, cb.Font, op)
 		}
 	}
@@ -89,7 +92,7 @@ func (cb *ComboBox) Update() {
 			cb.IsOpen = !cb.IsOpen // Toggle dropdown
 		} else if cb.IsOpen { // Check if an option is clicked
 			for i := range cb.Options {
-				optionY := cb.Y + cb.Height + float64(i)*cb.Height
+				optionY := cb.Y + float64(i)*cb.Height
 				if float64(mouseX) >= cb.X && float64(mouseX) <= cb.X+cb.Width &&
 					float64(mouseY) >= optionY && float64(mouseY) <= optionY+cb.Height {
 					cb.SelectedIndex = i
@@ -98,35 +101,5 @@ func (cb *ComboBox) Update() {
 				}
 			}
 		}
-	}
-}
-
-type Game struct {
-	comboBox *ComboBox
-}
-
-func (g *Game) Update() error {
-	g.comboBox.Update()
-	return nil
-}
-
-func (g *Game) Draw(screen *ebiten.Image) {
-	g.comboBox.Draw(screen)
-}
-
-func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return 800, 600 // Example screen size
-}
-
-func main() {
-	ebiten.SetWindowSize(800, 600)
-	ebiten.SetWindowTitle("Combo Box Example")
-
-	game := &Game{
-		comboBox: NewComboBox(100, 100, 200, 30, []string{"Option 1", "Option 2", "Option 3"}),
-	}
-
-	if err := ebiten.RunGame(game); err != nil {
-		panic(err)
 	}
 }
