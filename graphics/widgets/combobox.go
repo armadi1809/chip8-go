@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"image/color"
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"golang.org/x/image/font/gofont/goregular"
@@ -13,12 +15,14 @@ import (
 )
 
 type ComboBox struct {
-	X, Y          float64   // Position of the combo box
-	Width, Height float64   // Dimensions of the combo box
-	Options       []string  // List of options
-	SelectedIndex int       // Index of the currently selected option
-	IsOpen        bool      // Whether the dropdown is open
-	Font          text.Face // Font for rendering text
+	X, Y             float64   // Position of the combo box
+	Width, Height    float64   // Dimensions of the combo box
+	Options          []string  // List of options
+	SelectedIndex    int       // Index of the currently selected option
+	IsOpen           bool      // Whether the dropdown is open
+	Font             text.Face // Font for rendering text
+	lastClickTime    time.Time
+	debounceDuration time.Duration
 }
 
 func NewComboBox(x, y, width, height float64, options []string) *ComboBox {
@@ -32,14 +36,16 @@ func NewComboBox(x, y, width, height float64, options []string) *ComboBox {
 		Language: language.English,
 	}
 	return &ComboBox{
-		X:             x,
-		Y:             y,
-		Width:         width,
-		Height:        height,
-		Options:       options,
-		SelectedIndex: 0,
-		IsOpen:        false,
-		Font:          f, // Use a basic font
+		X:                x,
+		Y:                y,
+		Width:            width,
+		Height:           height,
+		Options:          options,
+		SelectedIndex:    0,
+		IsOpen:           false,
+		Font:             f, // Use a basic font
+		lastClickTime:    time.Time{},
+		debounceDuration: 250 * time.Millisecond,
 	}
 }
 
@@ -81,14 +87,21 @@ func (cb *ComboBox) Draw(screen *ebiten.Image) {
 }
 
 func (cb *ComboBox) Update() {
-	// Get mouse position
+
+	currentTime := time.Now()
+
+	// Check if enough time has passed since the last click
+	if currentTime.Sub(cb.lastClickTime) < cb.debounceDuration {
+		return
+	}
+
 	mouseX, mouseY := ebiten.CursorPosition()
 
-	// Check if the main box is clicked
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) || inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		if float64(mouseX) >= cb.X && float64(mouseX) <= cb.X+cb.Width &&
 			float64(mouseY) >= cb.Y && float64(mouseY) <= cb.Y+cb.Height {
 			cb.IsOpen = !cb.IsOpen // Toggle dropdown
+			cb.lastClickTime = time.Now()
 		} else if cb.IsOpen { // Check if an option is clicked
 			for i := range cb.Options {
 				optionY := cb.Y + float64(i+1)*cb.Height
@@ -96,6 +109,7 @@ func (cb *ComboBox) Update() {
 					float64(mouseY) >= optionY && float64(mouseY) <= optionY+cb.Height {
 					cb.SelectedIndex = i
 					cb.IsOpen = false // Close dropdown after selection
+					cb.lastClickTime = time.Now()
 					break
 				}
 			}
