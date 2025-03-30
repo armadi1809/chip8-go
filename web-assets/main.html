@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<script src="wasm_exec.js"></script>
+<script>
+  const go = new Go();
+  WebAssembly.instantiateStreaming(fetch("chip8go.wasm"), go.importObject).then(
+    (result) => {
+      go.run(result.instance);
+    }
+  );
+</script>
