@@ -8,6 +8,8 @@
         font-family: "Courier New", monospace;
         color: #33ff33;
         text-shadow: 0 0 5px #33ff33;
+        height: 100%;
+        margin: 0;
       }
 
       .retro-container {
@@ -15,11 +17,13 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 100vh;
+        min-height: 75vh;
         padding: 20px;
+        margin-top: 5px;
       }
 
       .crt-frame {
+        position: relative; /* Ensure the pseudo-element is positioned relative to this container */
         background-color: #1a1a1a;
         padding: 20px;
         border-radius: 15px;
@@ -59,6 +63,12 @@
         z-index: 1;
       }
 
+      /* Ensure the pseudo-element covers overflowing content */
+      .crt-frame::before {
+        height: auto; /* Allow the pseudo-element to grow with content */
+        min-height: 100%; /* Ensure it covers at least the container */
+      }
+
       /* Optional: Add some retro buttons or controls */
       .controls {
         margin-top: 20px;
@@ -86,10 +96,23 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        gap: 40px;
+      }
+      #emulator-info {
+        display: flex;
+        justify-content: flex-end;
       }
       h3 {
         text-align: center;
         padding: 20px 50px 20px 50px;
+      }
+      footer {
+        margin-left: 10px;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+        text-decoration: underline;
       }
     </style>
   </head>
@@ -102,12 +125,37 @@
           dropdown in the top left of the emulator screen
         </h3>
         <div id="emulator-container">
+          <div id="keymapping">
+            <p>Chip 8 pad to keyboard mapping:</p>
+            <p>1 -> 1</p>
+            <p>2 -> 2</p>
+            <p>3 -> 3</p>
+            <p>C -> 4</p>
+            <p>4 -> Q</p>
+            <p>5 -> W</p>
+            <p>6 -> E</p>
+            <p>D -> R</p>
+            <p>7 -> A</p>
+            <p>8 -> S</p>
+            <p>9 -> D</p>
+            <p>E -> F</p>
+            <p>A -> Z</p>
+            <p>0 -> X</p>
+            <p>B -> C</p>
+            <p>F -> v</p>
+          </div>
           <iframe
             allow="autoplay"
             src="main.html"
             width="640"
             height="480"
           ></iframe>
+        </div>
+        <div id="emulator-info">
+          <div>
+            <p>Developed by Aziz Rmadi</p>
+            <a href="https://www.github.com/armadi1809/chip8-go">Source Code</a>
+          </div>
         </div>
       </div>
     </div>
