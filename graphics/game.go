@@ -29,14 +29,14 @@ var defaultBeep []byte
 //go:embed roms/pong2.ch8
 var pong2 []byte
 
-//go:embed roms/IBM-Logo.ch8
-var testOpcode []byte
+//go:embed roms/spaceinvaders.ch8
+var spaceinvaders []byte
 
-var titles = []string{"pong2", "test_opcode"}
+var titles = []string{"pong2", "spaceinvaders"}
 
 var titleToRomMap = map[string][]byte{
-	"pong2":       pong2,
-	"test_opcode": testOpcode,
+	"pong2":         pong2,
+	"spaceinvaders": spaceinvaders,
 }
 
 const clockRate = 10
