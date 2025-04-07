@@ -21,7 +21,7 @@ jobs:
         # Step 4: Copy WASM runtime
       - name: Copy WASM runtime
         run: |
-          cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" ./web-assets
+          cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" ./web-assets
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
