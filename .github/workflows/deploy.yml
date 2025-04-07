@@ -6,13 +6,22 @@ on:
       - main
 
 jobs:
-  deploy:
+  buildanddeploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.24.1"
+      - name: Build WASM
+        run: |
+          mkdir -p dist
+          GOOS=js GOARCH=wasm go build -o ./web-assets/chip8go.wasm ./cmd/cli
+        # Step 4: Copy WASM runtime
+      - name: Copy WASM runtime
+        run: |
+          cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" ./web-assets
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
