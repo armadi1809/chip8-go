@@ -4,6 +4,8 @@ import (
 	"bytes"
 	_ "embed"
 	"io"
+	"log"
+	"os"
 
 	"github.com/armadi1809/chip8-go/chip8"
 	"github.com/armadi1809/chip8-go/graphics/widgets"
@@ -70,11 +72,13 @@ func (g *Game) Update() error {
 	}
 	g.emulator.UpdateTimers()
 	g.playBeepSoundEffectIfNeeded()
-	previousrom := g.combobox.SelectedIndex
-	g.combobox.Update()
-	if g.combobox.SelectedIndex != previousrom {
-		g.emulator.Initialize()
-		g.emulator.LoadProgram(titleToRomMap[titles[g.combobox.SelectedIndex]])
+	if g.combobox != nil {
+		previousrom := g.combobox.SelectedIndex
+		g.combobox.Update()
+		if g.combobox.SelectedIndex != previousrom {
+			g.emulator.Initialize()
+			g.emulator.LoadProgram(titleToRomMap[titles[g.combobox.SelectedIndex]])
+		}
 	}
 
 	return nil
@@ -92,7 +96,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	emulatorDrawOptions.GeoM.Scale(10, 12)
 	emulatorDrawOptions.GeoM.Translate(0, 50)
 	screen.DrawImage(emulatorImg, emulatorDrawOptions)
-	g.combobox.Draw(screen)
+	if g.combobox != nil {
+		g.combobox.Draw(screen)
+	}
 
 }
 
@@ -100,14 +106,26 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return outsideWidth, outsideHeight
 }
 
-func NewGame() *Game {
+func NewGame(romPath string) *Game {
 	emulator := chip8.New()
 	emulator.Initialize()
-	emulator.LoadProgram(pong2)
+	if romPath != "" {
+		rom, err := os.ReadFile(romPath)
+		if err != nil {
+			log.Fatalf("unable to read the rom file path %v", err)
+		}
+		emulator.LoadProgram(rom)
+	} else {
+		emulator.LoadProgram(pong2)
+	}
 	game := &Game{
 		emulator:     emulator,
 		audioContext: audio.NewContext(48000),
-		combobox:     widgets.NewComboBox(3, 3, 150, 20, titles),
+	}
+	if romPath != "" {
+		game.combobox = nil
+	} else {
+		game.combobox = widgets.NewComboBox(3, 3, 150, 20, titles)
 	}
 	game.setBeepSoundEffect()
 	return game
