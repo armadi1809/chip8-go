@@ -43,7 +43,7 @@ func NewComboBox(x, y, width, height float64, options []string) *ComboBox {
 		Options:          options,
 		SelectedIndex:    0,
 		IsOpen:           false,
-		Font:             f, // Use a basic font
+		Font:             f,
 		lastClickTime:    time.Time{},
 		debounceDuration: 250 * time.Millisecond,
 	}
@@ -100,15 +100,15 @@ func (cb *ComboBox) Update() {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) || inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		if float64(mouseX) >= cb.X && float64(mouseX) <= cb.X+cb.Width &&
 			float64(mouseY) >= cb.Y && float64(mouseY) <= cb.Y+cb.Height {
-			cb.IsOpen = !cb.IsOpen // Toggle dropdown
+			cb.IsOpen = !cb.IsOpen
 			cb.lastClickTime = time.Now()
-		} else if cb.IsOpen { // Check if an option is clicked
+		} else if cb.IsOpen {
 			for i := range cb.Options {
 				optionY := cb.Y + float64(i+1)*cb.Height
 				if float64(mouseX) >= cb.X && float64(mouseX) <= cb.X+cb.Width &&
 					float64(mouseY) >= optionY && float64(mouseY) <= optionY+cb.Height {
 					cb.SelectedIndex = i
-					cb.IsOpen = false // Close dropdown after selection
+					cb.IsOpen = false
 					cb.lastClickTime = time.Now()
 					break
 				}

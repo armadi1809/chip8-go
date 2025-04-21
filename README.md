@@ -49,3 +49,10 @@ Alternatively you can run the program without any roms and you can use a couple 
 ```bash
 ./chip8emulator
 ```
+
+### Online Demo
+
+You can also try the emulator directly in your web browser by visiting:
+[https://azizrmadi.com/projects/chip8/](https://azizrmadi.com/projects/chip8/)
+
+The web version includes some ROMs selectable from a dropdown and features as the desktop version.
