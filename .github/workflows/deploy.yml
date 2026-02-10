@@ -31,4 +31,6 @@ jobs:
 
       - name: Deploy folder to VPS
         run: |
-          scp -v -i ~/.ssh/chip8key -o StrictHostKeyChecking=no -r ./web-assets ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:./chip8go
+          scp -i ~/.ssh/chip8key -o StrictHostKeyChecking=no -r \
+            ./web-assets/* \
+            ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }}:/var/www/chip8
